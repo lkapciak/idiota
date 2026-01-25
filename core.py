@@ -54,6 +54,9 @@ class Card:
 class Deck:
     def __init__(self):
         self.cards = [Card(suit, rank) for suit in Suit for rank in Rank]
+    
+    def extend_deck(self, n=1):
+        self.cards.extend(n * Deck().cards)
 
     def shuffle(self):
         random.shuffle(self.cards)
@@ -88,9 +91,18 @@ class Hand:
     def __init__(self, player):
         self.player = player
         self.cards = []
+        self.open_cards = []
+        self.hidden_cards = []
 
-    def add_cards(self, cards):
-        self.cards.extend(cards)
+    def add_cards(self, cards, pile='cards'):
+        if pile == 'cards':
+            self.cards.extend(cards)
+        elif pile == 'open_cards':
+            self.open_cards.extend(cards)
+        elif pile == 'hidden_cards':
+            self.hidden_cards.extend(cards)
+        else:
+            pass
 
     def remove_card(self, card):
         if card in self.cards:
@@ -101,20 +113,25 @@ class Hand:
     def show(self):
         return [str(card) for card in self.cards]
     
-    def count_cards(self):
-        return len(self.cards)
+    def count_cards(self, pile='cards'):
+        if pile == 'cards':
+            return len(self.cards)
+        elif pile == 'open_cards':
+            return len(self.open_cards)
+        elif pile == 'hidden_cards':
+            return len(self.hidden_cards)
+        return None
 
     def __str__(self):
         return f"{self.player.name}'s hand: {self.show()}"
 
 
 class Game:
-    def __init__(self, player_names):
-        self.players = [Player(name) for name in player_names]
+    def __init__(self, players, deck, hands):
+        self.players = players
         self.players_count = len(self.players)
-        self.deck = Deck()
-        self.deck.shuffle()
-        self.hands = {player: Hand(player) for player in self.players}
+        self.deck = deck
+        self.hands = hands
         self.turn = 0
         self.table = []
 
