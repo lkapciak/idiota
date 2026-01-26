@@ -39,6 +39,11 @@ class Card:
         }
         return f"{self.rank.value}{suit_emoji[self.suit.name]}"
     
+    def __lt__(self, other):
+        if not isinstance(other, Card):
+            return NotImplemented
+        return self.get_rank() < other.get_rank()
+    
     def get_rank(self):
         try:
             return int(self.rank.value)

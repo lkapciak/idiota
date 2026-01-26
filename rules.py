@@ -12,3 +12,7 @@ def is_game_over(hands):
             print(f"{str(hand.player)} wins!")
             return True
     return False
+
+def is_legal(table, card):
+    last_table_card = table[-1]
+    return last_table_card < card        
