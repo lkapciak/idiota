@@ -6,11 +6,10 @@ def last_four_cards_rule(table):
         return True
     except: return False
 
-def is_game_over(hands):
-    for hand in hands:
-        if hand.count_cards('cards') + hand.count_cards('hidden_cards') + hand.count_cards('open_cards') == 0:
-            print(f"{str(hand.player)} wins!")
-            return True
+def is_player_winner(hand):
+    if hand.count_cards('cards') + hand.count_cards('hidden_cards') + hand.count_cards('open_cards') == 0:
+        print(f"{str(hand.player)} wins!")
+        return True
     return False
 
 def is_legal(table, card):
