@@ -136,6 +136,7 @@ class Game:
         self.players = players
         self.deck = deck
         self.hands = hands
+        self.round = 0
         self.turn = 0
         self.player_turn = 0
         self.table = []
@@ -154,7 +155,12 @@ class Game:
 
     def next_turn(self):
         self.turn += 1
-        self.player_turn = (self.player_turn + 1) % self.players_count
+        self.player_turn += 1
+
+        # Identical to modulo operator, but captures round increase
+        if self.player_turn >= self.players_count:
+            self.player_turn = 0
+            self.round += 1
 
     def discard_table(self):
         self.table.clear()
