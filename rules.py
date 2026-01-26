@@ -15,4 +15,8 @@ def is_game_over(hands):
 
 def is_legal(table, card):
     last_table_card = table[-1]
-    return last_table_card < card        
+    if card.get_rank() in [2, 5, 10]:
+        return True
+    if last_table_card.get_rank() == 5:
+        return card < last_table_card    
+    else: return last_table_card < card     
