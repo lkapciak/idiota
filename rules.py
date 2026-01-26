@@ -22,3 +22,13 @@ def is_legal(table, card):
             return card < last_table_card    
         else: return last_table_card < card     
     return True
+
+def has_legal_moves(table, hand):
+    if hand.cards:
+        active_cards = hand.cards
+    elif hand.open_cards:
+        active_cards = hand.open_cards
+    else:
+        active_cards = hand.hidden_cards
+
+    return any(is_legal(table, card) for card in active_cards)
