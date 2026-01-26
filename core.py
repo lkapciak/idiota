@@ -159,3 +159,6 @@ class Game:
     def check_last_four_cards(self):
         if last_four_cards_rule(self.table):
             self.discard_table()
+
+    def update_table(self, card):
+        self.table.append(card)
