@@ -138,6 +138,7 @@ class Game:
         self.deck = deck
         self.hands = hands
         self.turn = 0
+        self.player_turn = 0
         self.table = []
 
     def deal(self, n=3):
@@ -149,7 +150,8 @@ class Game:
             print(self.hands[player])
 
     def next_turn(self):
-        self.turn = (self.turn + 1) % len(self.players)
+        self.turn = (self.turn + 1) % self.players_count
+        self.player_turn = self.player_turn % self.players_count + 1
 
     def discard_table(self):
         self.table.clear()
