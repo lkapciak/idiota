@@ -95,31 +95,33 @@ def gui_init():
     
     return players, images, back_img
 
-def draw_card(surface, card, images, back_img, x, y, hidden=False):
-    if hidden:
-        surface.blit(back_img, (x, y))
-    else:
-        img = images.get((card.suit, card.rank))
-        if img:
-            surface.blit(img, (x, y))
-        else:
-            pygame.draw.rect(surface, (255,255,255), (x, y, CARD_WIDTH, CARD_HEIGHT))
-            font = pygame.font.SysFont(None, 30)
-            text = font.render(str(card), True, (0,0,0))
-            surface.blit(text, (x+10, y+10))
-
-def get_positions(player_index):
-    y_offset = 200 if player_index == 0 else HEIGHT-350
-    x_start = 200
-    gap = 100
-    positions = {
-        'hidden': [(x_start + i*gap, y_offset) for i in range(3)],
-        'open': [(x_start + i*gap, y_offset - 30) for i in range(3)],
-        'hand': [(x_start + i*gap, y_offset - 150 if player_index==0 else y_offset+150) for i in range(3)]
-    }
-    return positions
 
 def serve_gui(screen, game, images, back_img):
+    
+    def draw_card(surface, card, images, back_img, x, y, hidden=False):
+        if hidden:
+            surface.blit(back_img, (x, y))
+        else:
+            img = images.get((card.suit, card.rank))
+            if img:
+                surface.blit(img, (x, y))
+            else:
+                pygame.draw.rect(surface, (255,255,255), (x, y, CARD_WIDTH, CARD_HEIGHT))
+                font = pygame.font.SysFont(None, 30)
+                text = font.render(str(card), True, (0,0,0))
+                surface.blit(text, (x+10, y+10))
+
+    def get_positions(player_index):
+        y_offset = 200 if player_index == 0 else HEIGHT-350
+        x_start = 200
+        gap = 100
+        positions = {
+            'hidden': [(x_start + i*gap, y_offset) for i in range(3)],
+            'open': [(x_start + i*gap, y_offset - 30) for i in range(3)],
+            'hand': [(x_start + i*gap, y_offset - 150 if player_index==0 else y_offset+150) for i in range(3)]
+        }
+        return positions
+    
     running = True
     while running:
         CLOCK.tick(FPS)
