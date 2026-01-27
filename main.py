@@ -1,5 +1,6 @@
 from core import *
 from gui import *
+from rules import *
 
 def init_game(gui_player_names):
     
@@ -55,7 +56,7 @@ while game.players_count > 1:
     serve_gui(screen, game, images, back_img) # Show current state
     
     # --------------- No legal moves --------------- #
-    if not has_legal_moves():
+    if not has_legal_moves(current_table, current_hand):
         
         # Last resort - draw 1 card (if eligible), see if it saves you
         if current_hand.count_cards('cards') == 3 and current_deck.cards_left() > 0: # last resort conditions
