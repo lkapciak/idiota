@@ -15,7 +15,7 @@ def last_four_cards_rule(table: list) -> bool:
         return True
     except: return False
 
-def is_player_winner(hand: Hand) -> bool:
+def is_player_winner(hand) -> bool:
     """
     Determines whether a player has won.
     
@@ -26,7 +26,7 @@ def is_player_winner(hand: Hand) -> bool:
         return True
     return False
 
-def is_legal(table: list, card: Card) -> bool:
+def is_legal(table: list, card) -> bool:
     """
     Determines a card could be played with current table state.
     
@@ -42,7 +42,7 @@ def is_legal(table: list, card: Card) -> bool:
         else: return last_table_card < card     
     return True
 
-def has_legal_moves(table: list, hand: Hand) -> bool:
+def has_legal_moves(table: list, hand) -> bool:
     """
     Determines whether any card from a hand could be played with current table state.
     

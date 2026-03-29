@@ -32,7 +32,6 @@ def init_game(gui_player_names):
 
 gui_player_names = gui_init()
 game = init_game(gui_player_names)
-players = game.players
 
 pygame.init()
 screen = pygame.display.set_mode((1200, 800))
