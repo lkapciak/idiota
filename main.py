@@ -30,19 +30,8 @@ def init_game(gui_player_names):
     return game
 
 
-gui_player_names = gui_init()
-game = init_game(gui_player_names)
-
-pygame.init()
-screen = pygame.display.set_mode((1200, 800))
-pygame.display.set_caption("Card Game")
-font = pygame.font.SysFont(None, 36)
-
-players, images, back_img = gui_init()
-# [TO-DO] Let first player with the lowest card (not counting special cards) start by ordering player list
-
-game = init_game(gui_player_names=players)
-
+screen, players, images, back_img = gui_init()
+game = init_game(players)
 
 leaderboard = []
 
@@ -51,61 +40,120 @@ while game.players_count > 1:
     current_player, current_hand = game.players[current_player_turn], game.hands[current_player_turn]
     current_table = game.table[-1] if game.table else None
     current_deck = game.deck
-
-    serve_gui(screen, game, images, back_img) # Show current state
-    
     # --------------- No legal moves --------------- #
     if not has_legal_moves(current_table, current_hand):
-        
-        # Last resort - draw 1 card (if eligible), see if it saves you
-        if current_hand.count_cards('cards') == 3 and current_deck.cards_left() > 0: # last resort conditions
-            last_resort = current_deck.draw(1)
-            if is_legal(current_table, last_resort): # safe!
+
+        # Last resort - draw 1 card (if eligible)
+        if current_hand.count_cards('cards') == 3 and current_deck.cards_left() > 0:
+            last_resort = current_deck.draw(1)[0]
+
+            # Display drawn card for 3 seconds
+            show_temporary_message(
+                screen=screen,
+                game=game,
+                images=images,
+                back_img=back_img,
+                message_lines=[
+                    f"{current_player.name} dobiera pierwszą kartę...",
+                    f"Sprawdzamy, czy można ją zagrać."
+                ],
+                duration_ms=3000,
+                extra_card=last_resort,
+                active_player_idx=current_player_turn
+            )
+
+            if is_legal(current_table, last_resort):  # safe!
                 game.update_table(last_resort)
-            else: # not this time...
-                current_hand.add_cards([last_resort]) # take last resort
-                current_hand.add_cards(game.table) # and table contents
+
+                show_temporary_message(
+                    screen=screen,
+                    game=game,
+                    images=images,
+                    back_img=back_img,
+                    message_lines=[
+                        f"{current_player.name} został uratowany!",
+                        f"Karta {last_resort} została automatycznie zagrana."
+                    ],
+                    duration_ms=2000,
+                    active_player_idx=current_player_turn
+                )
+
+            else:  # not this time...
+                current_hand.add_cards([last_resort])
+                current_hand.add_cards(game.table)
                 game.discard_table()
                 current_table = None
-        
+
+                show_temporary_message(
+                    screen=screen,
+                    game=game,
+                    images=images,
+                    back_img=back_img,
+                    message_lines=[
+                        f"{current_player.name} nie ma legalnego ruchu."
+                    ],
+                    duration_ms=3000,
+                    active_player_idx=current_player_turn
+                )
+
+                game.next_turn()
+                continue
+
         # Last resort not possible
         else:
-            # [TO-DO] Inform the player there are no legal moves [TO-DO]
-            current_hand.add_cards(game.table) # Add all cards to current player's hand
-            game.discard_table() # by removing all cards from the table
-            game.next_turn()
+            show_temporary_message(
+                screen=screen,
+                game=game,
+                images=images,
+                back_img=back_img,
+                message_lines=[
+                    f"{current_player.name} nie ma legalnego ruchu.",
+                ],
+                duration_ms=2500,
+                active_player_idx=current_player_turn
+            )
 
+            current_hand.add_cards(game.table)  # Add all cards to current player's hand
+            game.discard_table()                # by removing all cards from the table
+            game.next_turn()
+            continue
 
 
     # --------------- Legal moves --------------- #
     else:
-        # Choose a move
-        # [TO-DO]
         is_choice_ready = False
         while not is_choice_ready:
-            card_choice = None # [TO-DO]
+            cards_to_play = choose_cards_via_gui(
+                screen=screen,
+                game=game,
+                images=images,
+                back_img=back_img,
+                current_hand=current_hand,
+                current_table=current_table,
+                player_index=current_player_turn,
+                is_legal=is_legal
+            )
+
+            card_choice = cards_to_play[0]
             is_choice_ready = is_legal(current_table, card_choice) # Set is_choice_ready = True when the move is legal 
-            # [TO-DO] check_multiple_cards_move()
-        # [TO-DO]
 
         # Throw a card
-        current_hand.remove_card(card_choice)
-        game.update_table(card_choice)
+        for card in cards_to_play:
+            current_hand.remove_card(card)
+            game.update_table(card)
         current_table = game.table[-1]
 
         # Draw until you have 3 cards if there are cards to be drawn
-        if current_deck.cards_left() > 0 and current_hand.count_cards() < 3:
+        if current_deck.cards_left() > 0 and current_hand.count_cards('cards') < 3:
             current_hand.add_cards(
                 current_deck.draw(
                     min(
-                        3 - current_hand.count_cards(),
+                        3 - current_hand.count_cards('cards'),
                         current_deck.cards_left() # if there aren't enough cards to draw, draw all left
                         )
-                    )
+                    ),
+                    'cards'
                 )
-
-        # [TO-DO] check_multiple_cards_move()
-
 
     if current_table: # If the table is not empty
         if current_table.get_rank() == 10: # Check if the last card was a 10
@@ -126,5 +174,5 @@ while game.players_count > 1:
     game.next_turn()
 
 # Adding the last player to the leaderboard
-leaderboard.append((game.players[0], 'LOSER!'))
+leaderboard.append((game.players[0].name, 'LOSER!'))
 # [TO-DO] Display leaderboard - player name, number of rounds it took to finish the game

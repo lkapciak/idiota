@@ -26,20 +26,19 @@ def is_player_winner(hand) -> bool:
         return True
     return False
 
-def is_legal(table: list, card) -> bool:
+def is_legal(last_table_card: list, card) -> bool:
     """
     Determines a card could be played with current table state.
     
     :param list of Cards table: Table history.
     :param Card object card: Player's card.
     """
-    if table:
-        last_table_card = table[-1]
+    if last_table_card:
         if card.get_rank() in [2, 5, 10]:
             return True
         if last_table_card.get_rank() == 5:
             return card < last_table_card    
-        else: return last_table_card < card     
+        else: return last_table_card < card or last_table_card == card
     return True
 
 def has_legal_moves(table: list, hand) -> bool:

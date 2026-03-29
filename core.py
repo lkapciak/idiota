@@ -44,6 +44,11 @@ class Card:
             return NotImplemented
         return self.get_rank() < other.get_rank()
     
+    def __eq__(self, other):
+        if not isinstance(other, Card):
+            return NotImplemented
+        return self.get_rank() == other.get_rank()
+    
     def get_rank(self):
         try:
             return int(self.rank.value)
